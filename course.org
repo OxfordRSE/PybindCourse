@@ -157,8 +157,40 @@ No change happens, as changes are not propagated back to Python.
 By making types opaque, pybind does not convert to native Python types
 and thus can be passed by reference.
 
+#+begin_src c++
+#include <pybind11/stl_bind.h>
+PYBIND11_MAKE_OPAQUE(std::vector<int>);
+
+// later
+py::bind_vector<std::vector<int>>(m, "VectorInt");
+#+end_src c++
+
+** Exercise (10 minutes)
+Make ~std::vector<int>~ opaque, and check that references work correctly now.
+
 * Named parameters
-  
+
+Python has the concept of named arguments, so I can say ~f(a=1, b=2)~
+instead of ~f(1, 2)~ which also allows us to reorder parameters.
+
+So far we have not been specifying parameter names, which meant we had
+to pass them in the same order that C++ expects. We can inform pybind
+of the argument names by specifying ~py::arg(name)~. There is a
+shortcut using C++ user literals as well
+(https://en.cppreference.com/w/cpp/language/user_literal):
+
+#+begin_src c++
+namespace py = pybind11;
+using namespace pybind11::literals;
+
+// later
+m.def("fibonacci", &fibonacci, "Calculate fibonacci series, first N numbers", "n"_a);
+#+end_src c++
+
+** Exercise (10 minutes)
+Add named arguments (and default arguments) to some functions of your
+choice and try it out.
+
 * Classes
 
 
