@@ -22,6 +22,7 @@ std::ostream& operator<<(std::ostream& strm, const std::vector<T>& v) {
 
 unsigned factorial(unsigned n);
 std::vector<int> fibonacci(int N);
+void square_vector(std::vector<int>& v);
 
 struct Date {
     unsigned year; // No BC dates!

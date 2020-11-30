@@ -8,6 +8,10 @@ unsigned factorial(unsigned n) {
     return m;
 }
 
+void square_vector(std::vector<int>& v) {
+    for(int& x: v) x = x*x;
+}
+
 std::vector<int> fibonacci(int N) {
     std::vector<int> out;
     out.reserve(N);
