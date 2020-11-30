@@ -47,7 +47,7 @@ This will install a *barbadoop* module:
 #+end_src
 
 The project structure will put the C++ module as pyBarbadoop within
-barbadoop (barbadoop.pyBarbadoop). This allows one to mix Python and
+barbadoop (~barbadoop.pyBarbadoop~). This allows one to mix Python and
 C++ code.
 
 * CMake configuration
@@ -93,21 +93,70 @@ PYBIND11_MODULE(pyBarbadoop, m) {
 
 * Simple functions
 
-Simple functions, such as factorial() above, where the parameters and
-return types are basic types are easy to set up, add a `m.def`
+Simple functions, such as ~factorial()~ above, where the parameters and
+return types are basic types are easy to set up, add a ~m.def~
 corresponding with a reference to the function.
 
 
 
-** Exercise (10 minutes)
-Implement a hypotenuse(a, b) function in the library
+** Exercise (15 minutes)
+Implement a hypotenuse(a, b) function in the library and corresponding
+Python binding. You should be able to call ~barbadoop.hypotenuse()~
+from Python.
+
+*Hint*: Math functions are in ~<cmath>~. Remember to add the function
+to the import in =__init__.py=!
+
 * Containers
   
 What about containers? pybind supports standard C++ containers
-natively. Let's take a look at a std::vector example:
+natively, with an additional include header:
 
+#+begin_src c++
+#include <pybind11/stl.h>
+#+end_src
 
-* PYBIND_MAKE_OPAQUE
+After compiling and a pip install:
+
+#+begin_src python
+>>> import barbadoop
+>>> fib10 = barbadoop.fibonacci(10)
+>>> fib10
+[1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
+>>> type(fib10)
+<class 'list'>
+#+end_src
+
+It works!
+
+* Opaque types
+
+Pybind's implementation of STL bindings are sufficient for most
+purposes. It's simple for people writing bindings and works with
+nested STLs, such as a list of lists or hash maps.
+
+** Disadvantages
+
+#+begin_quote
+However, a fundamental limitation of this approach is that internal
+conversions between Python and C++ types involve a copy operation that
+prevents pass-by-reference semantics.
+-- https://pybind11.readthedocs.io/en/stable/advanced/cast/stl.html#making-opaque-types
+#+end_quote
+
+The ~square_vector()~ function modifies a vector in place (squares it).
+
+** Exercise (5 minutes)
+What happens if you run ~square_vector()~ on a Python list?
+
+** Solution
+No change happens, as changes are not propagated back to Python.
+
+** Make types opaque
+
+By making types opaque, pybind does not convert to native Python types
+and thus can be passed by reference.
+
 * Named parameters
   
 * Classes
