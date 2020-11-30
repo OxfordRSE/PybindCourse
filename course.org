@@ -1,0 +1,118 @@
+#+title: pybind: Python Bindings for C++
+#+subtitle: Get the ease of use of Python with the speed of C++
+#+author: Abhishek Dasgupta
+
+* Introduction
+
+Pybind (https://pybind11.readthedocs.io/) is a library that helps in
+writing Python bindings for C++.
+
+We can use this to create an interface for C++ code in Python, giving
+us the speed of C++ with the ease of use of Python.
+
+https://github.com/OxfordRSE/PybindCourse
+
+* First run
+
+Source files in *src*: library.{cpp,hpp} main.cpp pybind.cpp
+
+Open the files in your editor and have a look. Then check that the project builds
+
+** Using cmake
+
+#+begin_src
+cd PybindCourse
+mkdir build && cd build
+cmake ..  # run every time CMakeLists.txt is changed
+cmake --build .
+#+end_src
+
+This should create barbadoop executable and pyBarbadoop cython package
+in the /build/ folder.
+
+** Using pip
+
+One of the reasons for using pybind is so that users can easily
+install packages using /pip/. This method is also supported. In the
+PybindCourse folder, try
+
+    pip install .
+
+This will install a *barbadoop* module:
+
+#+begin_src python
+>>> import barbadoop
+>>> barbadoop.factorial(20)
+2192834560
+#+end_src
+
+The project structure will put the C++ module as pyBarbadoop within
+barbadoop (barbadoop.pyBarbadoop). This allows one to mix Python and
+C++ code.
+
+* CMake configuration
+
+#+begin_src cmake (CMakeLists.txt)
+cmake_minimum_required(VERSION 3.13)
+project(Barbadoop LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+
+option(PYTHON_BINDINGS "Whether to build the Python bindings" ON)
+
+set(Barbadoop_source  src/library.cpp)
+set(Barbadoop_headers src/library.hpp)
+
+add_library(Barbadoop ${Barbadoop_source} ${Barbadoop_headers})
+add_executable(barbadoop src/main.cpp)
+target_link_libraries(barbadoop PRIVATE Barbadoop)
+
+if (PYTHON_BINDINGS)
+    add_subdirectory(pybind11)
+    pybind11_add_module(pyBarbadoop src/pybind.cpp)
+    target_link_libraries(pyBarbadoop PRIVATE Barbadoop)
+endif ()
+#+end_src
+
+** Note the name of the python module pyBarbadoop
+It has to be the same name in the Python bindings file
+
+* The Python bindings file
+
+#+begin_src python (pybind.cpp)
+#include <pybind11/pybind11.h>
+#include "library.hpp"
+
+namespace py = pybind11;
+
+PYBIND11_MODULE(pyBarbadoop, m) {
+    m.doc() = "PybindCourse module - barbadoop";
+    m.def("factorial", &factorial, "Calculate factorial");
+}
+#+end_src
+
+
+* Simple functions
+
+Simple functions, such as factorial() above, where the parameters and
+return types are basic types are easy to set up, add a `m.def`
+corresponding with a reference to the function.
+
+
+
+** Exercise (10 minutes)
+Implement a hypotenuse(a, b) function in the library
+* Containers
+  
+What about containers? pybind supports standard C++ containers
+natively. Let's take a look at a std::vector example:
+
+
+* PYBIND_MAKE_OPAQUE
+* Named parameters
+  
+* Classes
+
+
+
+
+   
