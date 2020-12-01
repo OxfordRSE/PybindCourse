@@ -14,8 +14,8 @@ The `--recurse-submodules` option to git fetches the pybind11 submodule. If you 
 
     git submodule update --init
 
-You'll also need [cmake](https://cmake.org) and a C++17 compiler (GCC
-8 onwards, for example).
+You'll also need [cmake](https://cmake.org) and a C++11 compiler (GCC
+4.8.1 and above, clang 3.3 and above).
 
 - **macOS**. Ensure the XCode command line tools are installed: `xcode-select
   --install`. Install [homebrew](https://brew.sh/) which is a package manager
