@@ -262,7 +262,7 @@ py::class_<Pet>(m, "Pet")
 ;
 #+end_src c++
 
-** Exercise (10 minutes)
+** Exercise (15 minutes)
 Copy =src/pybind_3_classes.cpp= to =src/pybind.cpp=.
 This gives an example binding for the ~Date~ struct.
 You can use this as a template.
