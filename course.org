@@ -14,16 +14,33 @@ https://github.com/OxfordRSE/PybindCourse
 
 * First run
 
+Clone the repository
+
+#+begin_src
+git clone --recurse-submodules https://github.com/OxfordRSE/PybindCourse
+#+end_src
+
+The =--recurse-submodules= option to git fetches the pybind11 submodule.
+If you missed passing this option, the submodule can always be fetched later:
+
+#+begin_src
+git submodule update --init
+#+end_src
+
 Source files in *src*: library.{cpp,hpp} main.cpp pybind.cpp
 
-Open the files in your editor and have a look. Then check that the project builds
+There are also files corresponding to the various
+checkpoints in the code.
+
+Open the files in your editor and have a look.
+Then check that the project builds
 
 ** Using cmake
 
 #+begin_src
 cd PybindCourse
 mkdir build && cd build
-cmake ..  # run every time CMakeLists.txt is changed
+cmake ..  # once
 cmake --build .
 #+end_src
 
@@ -34,7 +51,10 @@ in the /build/ folder.
 
 One of the reasons for using pybind is so that users can easily
 install packages using /pip/. This method is also supported. In the
-PybindCourse folder, try =pip install .=
+PybindCourse folder:
+
+1. Remove the =build= folder
+2. Do =pip install --user .=
 
 This will install a *barbadoop* module:
 
@@ -53,7 +73,9 @@ C++ code.
 #+begin_src cmake (CMakeLists.txt)
 cmake_minimum_required(VERSION 3.13)
 project(Barbadoop LANGUAGES CXX)
+
 set(CMAKE_CXX_STANDARD 17)
+add_compile_options(-Wall -pedantic -fPIC)
 
 option(PYTHON_BINDINGS "Whether to build the Python bindings" ON)
 
@@ -127,6 +149,8 @@ After compiling and a pip install:
 
 It works!
 
+See https://pybind11.readthedocs.io/en/stable/advanced/cast/stl.html
+for more examples for STL container bindings.
 * Opaque types
 
 Pybind's implementation of STL bindings are sufficient for most
@@ -153,16 +177,27 @@ No change happens, as changes are not propagated back to Python.
 ** Make types opaque
 
 By making types opaque, pybind does not convert to native Python types
-and thus can be passed by reference.
+and thus can be passed by reference. This is in a new header
+=<pybind11/stl_bind.h>=:
 
-#+begin_src c++
+#+begin_src c++ pybind.cpp
 #include <pybind11/stl_bind.h>
 PYBIND11_MAKE_OPAQUE(std::vector<int>);
 
-// later
+// within PYBIND11_MODULE(pyBarbadoop, m)
 py::bind_vector<std::vector<int>>(m, "VectorInt");
 #+end_src c++
 
+You can't pass =[1, 2, 3]= to ~square_vector()~ after this.
+You'll need to wrap it:
+
+#+begin_src python
+>>> from barbadoop import square_vector, VectorInt
+>>> a = VectorInt([1, 2, 3])  # now a is opaque
+>>> square_vector(a)
+>>> a
+[1, 4, 9]
+#+end_src
 ** Exercise (10 minutes)
 Make ~std::vector<int>~ opaque, and check that references work correctly now.
 
@@ -175,17 +210,32 @@ So far we have not been specifying parameter names, which meant we had
 to pass them in the same order that C++ expects. We can inform pybind
 of the argument names by specifying ~py::arg(name)~. There is a
 shortcut using C++ user literals as well
-(https://en.cppreference.com/w/cpp/language/user_literal):
+(https://en.cppreference.com/w/cpp/language/user_literal). To use that:
+
+Replace ~py::arg("name1"), py::arg("name2")~
+with ~"name1"_a, "name2"_a~.
 
 #+begin_src c++
 namespace py = pybind11;
-using namespace pybind11::literals;
+using namespace pybind11::literals; // add this!
 
-// later
-m.def("fibonacci", &fibonacci, "Calculate fibonacci series, first N numbers", "n"_a);
-// default arguments
-m.def("fibonacci", &fibonacci, "Calculate fibonacci series, first N numbers", "n"_a = 10);
+// 1. no default arguments, short form of 2.
+m.def("fibonacci", &fibonacci,
+      "Calculate fibonacci series, first N numbers", "n"_a);
+// 2. no default arguments, without user literals
+m.def("fibonacci", &fibonacci,
+      "Calculate fibonacci series, first N numbers", py::arg("n"));
+// 3. with default arguments
+m.def("fibonacci", &fibonacci,
+      "Calculate fibonacci series, first N numbers", "n"_a = 10);
 #+end_src c++
+
+Pybind generates help messages for the bindings as well!
+
+#+begin_src python
+>>> import barbadoop
+>>> help(barbadoop.hypotenuse)
+#+end_src
 
 ** Exercise (10 minutes)
 Add named arguments (and default arguments) to some functions of your
@@ -195,22 +245,33 @@ choice and try it out.
 
 Classes are defined similarly, except within an ~py::class~ function
 
-#+begin_src c++
+If your class is named ~Pet~ ([[https://pybind11.readthedocs.io/en/stable/classes.html][example from documentation]]):
+
+#+begin_src c++ pybind.cpp
 py::class_<Pet>(m, "Pet")
   .def(py::init<const std::string &>())
+  //            ^^ specify the types only of the constructor
   .def("setName", &Pet::setName)
   .def("getName", &Pet::getName)
   .def_readwrite("age", &Pet::age) // fields
   .def_readonly("colour", &Pet::colour) // const fields
   // Python property using getters and setters
   .def_property("name", &Pet::getName, &Pet::setName)
+  // access using Pet.name
   .def_property_readonly("name", &Pet::getName)
 ;
 #+end_src c++
+
+** Exercise (10 minutes)
+Copy =src/pybind_3_classes.cpp= to =src/pybind.cpp=.
+This gives an example binding for the ~Date~ struct.
+You can use this as a template.
+
+Add bindings for the Person class.
 
 * Wrapping up
 
 All the material is available at
 https://github.com/OxfordRSE/PybindCourse
 
-Any questions, post on Slack or email me!
+Any questions, email me!
