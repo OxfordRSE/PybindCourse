@@ -36,6 +36,9 @@ class Person {
     public:
         Person(Date bday, std::string n);
         std::string name;
-        int age();
+        int current_age() const;
+        int age_in_year(int year) const;
 };
+
+std::ostream& operator<<(std::ostream& strm, const Person& p);
 #endif

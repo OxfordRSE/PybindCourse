@@ -7,4 +7,6 @@ int main() {
     auto fib5 = fibonacci(5);
     square_vector(fib5);
     std::cout << "square_vector(fibonacci(5)) = " << fib5 << std::endl;
+    Person person(Date {1990,1,1}, "Foo");
+    std::cout << "person = " << person << std::endl;
 }
