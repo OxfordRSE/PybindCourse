@@ -30,6 +30,7 @@ struct Date {
     unsigned year; // No BC dates!
     unsigned month;
     unsigned day;
+    Date(unsigned y, unsigned m, unsigned d) : year(y), month(m), day(d) {}
 };
 
 class Person {
