@@ -185,6 +185,8 @@ using namespace pybind11::literals;
 
 // later
 m.def("fibonacci", &fibonacci, "Calculate fibonacci series, first N numbers", "n"_a);
+// default arguments
+m.def("fibonacci", &fibonacci, "Calculate fibonacci series, first N numbers", "n"_a = 10);
 #+end_src c++
 
 ** Exercise (10 minutes)
