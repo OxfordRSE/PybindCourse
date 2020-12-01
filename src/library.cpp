@@ -27,7 +27,7 @@ std::vector<int> fibonacci(int N) {
 }
 
 Person::Person(Date bday, std::string n) : birthday(bday), name(n) {}
-int Person::age_in_year(int year) const { return year - birthday.year; };
+int Person::age_in_year(int year) const { return year - birthday.year; }
 int Person::current_age() const { return age_in_year(2020); } // use ctime to get actual time
 
 std::ostream& operator<<(std::ostream& strm, const Person& p) {
