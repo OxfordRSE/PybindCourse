@@ -34,9 +34,7 @@ in the /build/ folder.
 
 One of the reasons for using pybind is so that users can easily
 install packages using /pip/. This method is also supported. In the
-PybindCourse folder, try
-
-    pip install .
+PybindCourse folder, try =pip install .=
 
 This will install a *barbadoop* module:
 
@@ -195,7 +193,24 @@ choice and try it out.
 
 * Classes
 
+Classes are defined similarly, except within an ~py::class~ function
 
+#+begin_src c++
+py::class_<Pet>(m, "Pet")
+  .def(py::init<const std::string &>())
+  .def("setName", &Pet::setName)
+  .def("getName", &Pet::getName)
+  .def_readwrite("age", &Pet::age) // fields
+  .def_readonly("colour", &Pet::colour) // const fields
+  // Python property using getters and setters
+  .def_property("name", &Pet::getName, &Pet::setName)
+  .def_property_readonly("name", &Pet::getName)
+;
+#+end_src c++
 
+* Wrapping up
 
-   
+All the material is available at
+https://github.com/OxfordRSE/PybindCourse
+
+Any questions, post on Slack or email me!
