@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.13)
 project(Barbadoop LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
+add_compile_options(-Wall -pedantic -fPIC)
 
 option(PYTHON_BINDINGS "Whether to build the Python bindings" ON)
 
